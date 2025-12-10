@@ -42,10 +42,10 @@ static void count_symbols(const char *filename) {
         exit(1);
     }
 
-    // 1Byteずつ読み込み、カウントする
-    /*
-      write a code for counting
-    */
+    int c;
+    while ((c = fgetc(fp)) != EOF) {
+        symbol_count[c]++;
+    }
 
     fclose(fp);
 }
@@ -113,22 +113,31 @@ static Node *build_tree(void) {
 // Perform depth-first traversal of the tree
 // 深さ優先で木を走査する
 // 現状は何もしていない（再帰してたどっているだけ）
-void traverse_tree(const int depth, const Node *np) {             
-    if (np == NULL || np->left == NULL) return;
 
-    traverse_tree(depth + 1, np->left);
-    traverse_tree(depth + 1, np->right);
+void traverse_tree(const int depth, const Node *root) {
+    if (root == NULL) return;
+
+    for (int i = 0; i < depth; i++) printf("  ");
+    if (root->symbol >= 0)
+        printf("%c (%d)\n", root->symbol, root->count);
+    else
+        printf("* (%d)\n", root->count);
+
+    traverse_tree(depth + 1, root->left);
+    traverse_tree(depth + 1, root->right);
 }
 
-// この関数は外部 (main) で使用される (staticがついていない)
+extern void reset_count(void);
+extern void count_symbols(const char *filename);
+extern Node *build_tree(void);
+
 Node *encode(const char *filename) {
     reset_count();
     count_symbols(filename);
     Node *root = build_tree();
 
-    if (root == NULL){
-        fprintf(stderr,"A tree has not been constructed.\n");
+    if (root == NULL) {
+        printf("A tree has not been constructed.\n");
     }
-
     return root;
 }
