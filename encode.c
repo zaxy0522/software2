@@ -88,24 +88,24 @@ static Node *build_tree(void) {
     Node *nodep[NSYMBOLS];
 
     for (int i = 0; i < NSYMBOLS; i++) {
-        // カウントの存在しなかったシンボルには何もしない
         if (symbol_count[i] == 0) continue;
         nodep[n++] = create_node(i, symbol_count[i], NULL, NULL);
     }
 
-    const int dummy = -1; // ダミー用のsymbol を用意しておく
+    const int dummy = -1;
+
     while (n >= 2) {
         Node *node1 = pop_min(&n, nodep);
         Node *node2 = pop_min(&n, nodep);
 
-        // Create a new node
-        // 選ばれた2つのノードを元に統合ノードを新規作成
-        // 作成したノードはnodepにどうすればよいか?
+        Node *new_node = create_node(dummy,
+                                     node1->count + node2->count,
+                                     node1, node2);
 
+        nodep[n++] = new_node;   // ← 必ずここに戻す！
     }
 
-    // なぜ以下のコードで木を返したことになるか少し考えてみましょう
-    return (n==0)?NULL:nodep[0];
+    return (n == 0) ? NULL : nodep[0];
 }
 
 
